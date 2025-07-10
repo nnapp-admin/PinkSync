@@ -757,13 +757,17 @@ footer {
   border-radius: 1.5rem;
   width: 90%;
   max-width: 26rem;
-  min-height: 600px; /* Reduced from 800px to 600px */
+  min-height: 600px; /* Default height for form */
   overflow: hidden;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
   animation: slideUp 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Ensure space between top and bottom */
+}
+
+.modal-content.success {
+  min-height: 200px; /* Smaller height for success message */
 }
 
 .modal-title {
@@ -905,11 +909,23 @@ footer {
   font-size: 1rem;
   margin-top: auto; /* Push to bottom */
   width: 100%; /* Ensure it takes full width */
+  background: linear-gradient(135deg, #ff1a8c 0%, #ff66b3 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .submit-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 5px 25px rgba(255, 26, 140, 0.4);
+}
+
+.submit-button:disabled {
+  background: linear-gradient(135deg, #ff1a8c80 0%, #ff66b380 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .message {
@@ -920,6 +936,35 @@ footer {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Loading Spinner */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 200px; /* Matches success message height */
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #ff1a8c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Success Message */
+.success-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 200px; /* Matches loading container height */
+  text-align: center;
+  padding: 1rem;
 }
 
 /* Animations */
@@ -941,6 +986,11 @@ footer {
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Mobile Responsiveness */
@@ -989,8 +1039,12 @@ footer {
   .modal-content {
     width: 90%;
     max-width: 20rem; /* Reduced further for mobile */
-    min-height: 600px; /* Reduced from 800px to 600px */
+    min-height: 600px; /* Default height for form on mobile */
     padding: 0.75rem;
+  }
+
+  .modal-content.success {
+    min-height: 150px; /* Smaller height for success message on mobile */
   }
 
   .modal-overlay {
@@ -1015,6 +1069,11 @@ footer {
     top: 0.5rem;
     right: 0.5rem;
     font-size: 1.1rem;
+  }
+
+  .loading-container,
+  .success-message {
+    min-height: 150px; /* Matches success modal height on mobile */
   }
 }
 

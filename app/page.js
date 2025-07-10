@@ -14,6 +14,7 @@ export default function Home() {
     forWhom: '',
   });
   const [submitMessage, setSubmitMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // New state for loading
 
   const handleFAQToggle = (index) => {
     setActiveFAQ(activeFAQ === index ? null : index);
@@ -21,22 +22,33 @@ export default function Home() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch('/api/submit-form', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-    const data = await response.json();
-    setSubmitMessage(data.success ? '🎉 Thank you! You’re on the list! We’ll notify you with a sprinkle of magic! ✨' : 'Oops! Something went wrong. Please try again.');
-    if (data.success) {
-      setFormData({
-        fullName: '',
-        whatsappNumber: '',
-        ageGroup: '',
-        cityLocation: '',
-        forWhom: '',
+    setIsLoading(true); // Start loading
+    try {
+      const response = await fetch('/api/submit-form', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
-      setTimeout(() => setShowForm(false), 3000); // Auto-close after 3 seconds on success
+      const data = await response.json();
+      setSubmitMessage(
+        data.success
+          ? '🎉 Thank you! You’re on the list! We’ll notify you with a sprinkle of magic! ✨'
+          : 'Oops! Something went wrong. Please try again.'
+      );
+      if (data.success) {
+        setFormData({
+          fullName: '',
+          whatsappNumber: '',
+          ageGroup: '',
+          cityLocation: '',
+          forWhom: '',
+        });
+        // Modal stays open to show message; no auto-close
+      }
+    } catch (error) {
+      setSubmitMessage('Oops! Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -272,82 +284,97 @@ export default function Home() {
       {/* Form Modal */}
       {showForm && (
         <div className="modal-overlay">
-          <div className="modal-content glass">
+          <div className={`modal-content glass ${submitMessage && !isLoading ? 'success' : ''}`}>
             <button className="close-button" onClick={() => setShowForm(false)}>
               ×
             </button>
             <h2 className="modal-title">Join Waitlist or Preorder</h2>
-            <form onSubmit={handleFormSubmit} className="modal-form">
-              <div className="form-group">
-                <label htmlFor="fullName">Full Name</label>
-                <input
-                  type="text"
-                  id="fullName"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  placeholder="Enter your full name"
-                  required
-                />
+            {submitMessage && !isLoading ? (
+              <div className="success-message">
+                <p className="message">{submitMessage}</p>
               </div>
-              <div className="form-group">
-                <label htmlFor="whatsappNumber">WhatsApp Number</label>
-                <input
-                  type="tel"
-                  id="whatsappNumber"
-                  value={formData.whatsappNumber}
-                  onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
-                  placeholder="e.g., +91 123 456 7890"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="ageGroup">Age Group</label>
-                <select
-                  id="ageGroup"
-                  value={formData.ageGroup}
-                  onChange={(e) => setFormData({ ...formData, ageGroup: e.target.value })}
-                  required
-                >
-                  <option value="">Select Age Group</option>
-                  <option value="Under 13">Under 13</option>
-                  <option value="13-18">13-18</option>
-                  <option value="18-24">18-24</option>
-                  <option value="25-34">25-34</option>
-                  <option value="35-44">35-44</option>
-                  <option value="45+">45+</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label htmlFor="cityLocation">City / Location</label>
-                <input
-                  type="text"
-                  id="cityLocation"
-                  value={formData.cityLocation}
-                  onChange={(e) => setFormData({ ...formData, cityLocation: e.target.value })}
-                  placeholder="Enter your city or location"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Who are you signing up for?</label>
-                <div className="radio-group">
-                  {['Myself', 'My daughter', 'My sister', 'A friend', 'Other'].map((option) => (
-                    <label key={option}>
+            ) : (
+              <form onSubmit={handleFormSubmit} className="modal-form">
+                {isLoading ? (
+                  <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="form-group">
+                      <label htmlFor="fullName">Full Name</label>
                       <input
-                        type="radio"
-                        name="forWhom"
-                        value={option}
-                        checked={formData.forWhom === option}
-                        onChange={(e) => setFormData({ ...formData, forWhom: e.target.value })}
+                        type="text"
+                        id="fullName"
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        placeholder="Enter your full name"
+                        required
                       />
-                      {option}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <button type="submit" className="submit-button">Submit</button>
-              {submitMessage && <p className="message">{submitMessage}</p>}
-            </form>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="whatsappNumber">WhatsApp Number</label>
+                      <input
+                        type="tel"
+                        id="whatsappNumber"
+                        value={formData.whatsappNumber}
+                        onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
+                        placeholder="e.g., +91 123 456 7890"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="ageGroup">Age Group</label>
+                      <select
+                        id="ageGroup"
+                        value={formData.ageGroup}
+                        onChange={(e) => setFormData({ ...formData, ageGroup: e.target.value })}
+                        required
+                      >
+                        <option value="">Select Age Group</option>
+                        <option value="Under 13">Under 13</option>
+                        <option value="13-18">13-18</option>
+                        <option value="18-24">18-24</option>
+                        <option value="25-34">25-34</option>
+                        <option value="35-44">35-44</option>
+                        <option value="45+">45+</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="cityLocation">City / Location</label>
+                      <input
+                        type="text"
+                        id="cityLocation"
+                        value={formData.cityLocation}
+                        onChange={(e) => setFormData({ ...formData, cityLocation: e.target.value })}
+                        placeholder="Enter your city or location"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Who are you signing up for?</label>
+                      <div className="radio-group">
+                        {['Myself', 'My daughter', 'My sister', 'A friend', 'Other'].map((option) => (
+                          <label key={option}>
+                            <input
+                              type="radio"
+                              name="forWhom"
+                              value={option}
+                              checked={formData.forWhom === option}
+                              onChange={(e) => setFormData({ ...formData, forWhom: e.target.value })}
+                            />
+                            {option}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <button type="submit" className="submit-button" disabled={isLoading}>
+                      Submit
+                    </button>
+                  </>
+                )}
+              </form>
+            )}
           </div>
         </div>
       )}
