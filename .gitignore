@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Next.js build output
+.next/
+out/
+
+# macOS system files
+.DS_Store
+
+# IDE and editor files
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Environment variable files
+.env.local
+.env.development
+.env.production
+
+# TypeScript cache
+*.tsbuildinfo
